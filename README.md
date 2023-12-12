@@ -6,6 +6,6 @@ Status: under development. Use [osmio](https://crates.io/crates/osmio) for somet
 
 TODO before a crates.io release:
 
-- [ ] Use an iterator (and the lower-level xmlparser approach from [osm2streets](https://github.com/a-b-street/osm2streets/blob/main/streets_reader/src/osm_reader/reader.rs)) to minimize memory
+- [ ] Use the lower-level xmlparser approach from [osm2streets](https://github.com/a-b-street/osm2streets/blob/main/streets_reader/src/osm_reader/reader.rs) to minimize memory
 - [ ] Other TODOs in the code
 - [ ] Tests, docs, examples

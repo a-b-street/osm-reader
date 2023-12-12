@@ -3,8 +3,7 @@ use osmpbf::ElementReader;
 
 use crate::*;
 
-pub fn parse_pbf(input_bytes: &[u8]) -> Result<Vec<Element>> {
-    let mut elements = Vec::new();
+pub fn parse_pbf<F: FnMut(Element)>(input_bytes: &[u8], mut callback: F) -> Result<()> {
     let reader = ElementReader::new(input_bytes);
     reader.for_each(|element| {
         match element {
@@ -17,7 +16,7 @@ pub fn parse_pbf(input_bytes: &[u8]) -> Result<Vec<Element>> {
 
                 let lon = node.lon();
                 let lat = node.lat();
-                elements.push(Element::Node { id, lon, lat, tags });
+                callback(Element::Node { id, lon, lat, tags });
             }
             osmpbf::Element::DenseNode(node) => {
                 let id = NodeID(node.id());
@@ -28,7 +27,7 @@ pub fn parse_pbf(input_bytes: &[u8]) -> Result<Vec<Element>> {
 
                 let lon = node.lon();
                 let lat = node.lat();
-                elements.push(Element::Node { id, lon, lat, tags });
+                callback(Element::Node { id, lon, lat, tags });
             }
             osmpbf::Element::Way(way) => {
                 let id = WayID(way.id());
@@ -41,7 +40,7 @@ pub fn parse_pbf(input_bytes: &[u8]) -> Result<Vec<Element>> {
                 for id in way.refs() {
                     node_ids.push(NodeID(id));
                 }
-                elements.push(Element::Way { id, node_ids, tags });
+                callback(Element::Way { id, node_ids, tags });
             }
             osmpbf::Element::Relation(relation) => {
                 let id = RelationID(relation.id());
@@ -65,9 +64,9 @@ pub fn parse_pbf(input_bytes: &[u8]) -> Result<Vec<Element>> {
                     };
                     members.push((role.to_string(), id));
                 }
-                elements.push(Element::Relation { id, tags, members });
+                callback(Element::Relation { id, tags, members });
             }
         }
     })?;
-    Ok(elements)
+    Ok(())
 }

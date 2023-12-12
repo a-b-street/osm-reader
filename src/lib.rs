@@ -73,15 +73,14 @@ pub enum Element {
     },
 }
 
-/// Takes bytes representing an OSM XML or PBF file, and returns all elements. The order should be
-/// all nodes, then ways, then relations, per
+/// Parses bytes representing an OSM XML or PBF file and invokes the callback for every element.
+/// The order should be all nodes, then ways, then relations, per
 /// <https://wiki.openstreetmap.org/wiki/OSM_XML#Certainties_and_Uncertainties>
-// TODO Consider an Iterator instead
-pub fn parse(input_bytes: &[u8]) -> Result<Vec<Element>> {
+pub fn parse<F: FnMut(Element)>(input_bytes: &[u8], callback: F) -> Result<()> {
     if is_xml(input_bytes) {
-        parse_xml(input_bytes)
+        parse_xml(input_bytes, callback)
     } else {
-        parse_pbf(input_bytes)
+        parse_pbf(input_bytes, callback)
     }
 }
 

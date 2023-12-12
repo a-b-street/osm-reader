@@ -4,11 +4,10 @@ use anyhow::Result;
 
 use crate::*;
 
-pub fn parse_xml(input_bytes: &[u8]) -> Result<Vec<Element>> {
+pub fn parse_xml<F: FnMut(Element)>(input_bytes: &[u8], mut callback: F) -> Result<()> {
     let input_string = String::from_utf8(input_bytes.to_vec())?;
     // TODO anyhow compatibility
     let tree = roxmltree::Document::parse(&input_string).unwrap();
-    let mut elements = Vec::new();
     for obj in tree.descendants() {
         if !obj.is_element() {
             continue;
@@ -22,7 +21,7 @@ pub fn parse_xml(input_bytes: &[u8]) -> Result<Vec<Element>> {
                 let lon = obj.attribute("lon").unwrap().parse::<f64>()?;
                 let lat = obj.attribute("lat").unwrap().parse::<f64>()?;
                 let tags = read_tags(obj);
-                elements.push(Element::Node { id, lon, lat, tags });
+                callback(Element::Node { id, lon, lat, tags });
             }
             "way" => {
                 let id = WayID(obj.attribute("id").unwrap().parse::<i64>()?);
@@ -36,7 +35,7 @@ pub fn parse_xml(input_bytes: &[u8]) -> Result<Vec<Element>> {
                         node_ids.push(n);
                     }
                 }
-                elements.push(Element::Way { id, node_ids, tags });
+                callback(Element::Way { id, node_ids, tags });
             }
             "relation" => {
                 let id = RelationID(obj.attribute("id").unwrap().parse::<i64>()?);
@@ -66,12 +65,12 @@ pub fn parse_xml(input_bytes: &[u8]) -> Result<Vec<Element>> {
                         members.push((child.attribute("role").unwrap().to_string(), member));
                     }
                 }
-                elements.push(Element::Relation { id, members, tags });
+                callback(Element::Relation { id, members, tags });
             }
             _ => {}
         }
     }
-    Ok(elements)
+    Ok(())
 }
 
 fn read_tags(obj: roxmltree::Node) -> HashMap<String, String> {
