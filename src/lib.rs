@@ -5,7 +5,7 @@ use std::collections::HashMap;
 use std::fmt;
 
 use anyhow::Result;
-#[cfg(feature = "geo-types")]
+#[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
 pub use self::pbf::parse_pbf;
