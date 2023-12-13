@@ -14,7 +14,12 @@ pub fn parse_xml<F: FnMut(Element)>(input_bytes: &[u8], mut callback: F) -> Resu
         }
         match obj.tag_name().name() {
             "bounds" => {
-                // TODO Use this or not?
+                callback(Element::Bounds {
+                    min_lon: obj.attribute("minlon").unwrap().parse::<f64>().unwrap(),
+                    min_lat: obj.attribute("minlat").unwrap().parse::<f64>().unwrap(),
+                    max_lon: obj.attribute("maxlon").unwrap().parse::<f64>().unwrap(),
+                    max_lat: obj.attribute("maxlat").unwrap().parse::<f64>().unwrap(),
+                });
             }
             "node" => {
                 let id = NodeID(obj.attribute("id").unwrap().parse::<i64>()?);

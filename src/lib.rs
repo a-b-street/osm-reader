@@ -60,6 +60,12 @@ impl fmt::Display for OsmID {
 // TODO Into for both directions
 
 pub enum Element {
+    Bounds {
+        min_lon: f64,
+        min_lat: f64,
+        max_lon: f64,
+        max_lat: f64,
+    },
     Node {
         id: NodeID,
         lon: f64,
