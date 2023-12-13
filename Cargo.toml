@@ -3,7 +3,11 @@ name = "osm-reader"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+serde = ["dep:serde"]
+
 [dependencies]
 anyhow = "1.0.75"
 osmpbf = "0.3.2"
 roxmltree = { version = "0.19.0", default-features = false }
+serde = { version = "1.0", features = ["derive"], optional = true }

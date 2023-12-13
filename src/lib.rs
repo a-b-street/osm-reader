@@ -5,16 +5,21 @@ use std::collections::HashMap;
 use std::fmt;
 
 use anyhow::Result;
+#[cfg(feature = "geo-types")]
+use serde::{Deserialize, Serialize};
 
 pub use self::pbf::parse_pbf;
 pub use self::xml::parse_xml;
 
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub struct NodeID(pub i64);
 
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub struct WayID(pub i64);
 
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub struct RelationID(pub i64);
 
@@ -34,6 +39,7 @@ impl fmt::Display for RelationID {
     }
 }
 
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub enum OsmID {
     Node(NodeID),
