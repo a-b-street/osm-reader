@@ -47,6 +47,16 @@ pub enum OsmID {
     Relation(RelationID),
 }
 
+impl OsmID {
+    pub fn inner_id(self) -> i64 {
+        match self {
+            OsmID::Node(id) => id.0,
+            OsmID::Way(id) => id.0,
+            OsmID::Relation(id) => id.0,
+        }
+    }
+}
+
 impl fmt::Display for OsmID {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
