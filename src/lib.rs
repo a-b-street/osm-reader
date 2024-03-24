@@ -81,17 +81,20 @@ pub enum Element {
         lon: f64,
         lat: f64,
         tags: HashMap<String, String>,
+        version: Option<i32>,
     },
     Way {
         id: WayID,
         node_ids: Vec<NodeID>,
         tags: HashMap<String, String>,
+        version: Option<i32>,
     },
     Relation {
         id: RelationID,
         tags: HashMap<String, String>,
         // Role, member ID
         members: Vec<(String, OsmID)>,
+        version: Option<i32>,
     },
 }
 

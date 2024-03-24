@@ -29,7 +29,14 @@ pub fn parse_pbf<F: FnMut(Element)>(input_bytes: &[u8], mut callback: F) -> Resu
 
                             let lon = node.lon();
                             let lat = node.lat();
-                            callback(Element::Node { id, lon, lat, tags });
+                            let version = node.info().version();
+                            callback(Element::Node {
+                                id,
+                                lon,
+                                lat,
+                                tags,
+                                version,
+                            });
                         }
                         osmpbf::Element::DenseNode(node) => {
                             let id = NodeID(node.id());
@@ -40,7 +47,14 @@ pub fn parse_pbf<F: FnMut(Element)>(input_bytes: &[u8], mut callback: F) -> Resu
 
                             let lon = node.lon();
                             let lat = node.lat();
-                            callback(Element::Node { id, lon, lat, tags });
+                            let version = node.info().map(|x| x.version());
+                            callback(Element::Node {
+                                id,
+                                lon,
+                                lat,
+                                tags,
+                                version,
+                            });
                         }
                         osmpbf::Element::Way(way) => {
                             let id = WayID(way.id());
@@ -53,10 +67,17 @@ pub fn parse_pbf<F: FnMut(Element)>(input_bytes: &[u8], mut callback: F) -> Resu
                             for id in way.refs() {
                                 node_ids.push(NodeID(id));
                             }
-                            callback(Element::Way { id, node_ids, tags });
+                            let version = way.info().version();
+                            callback(Element::Way {
+                                id,
+                                node_ids,
+                                tags,
+                                version,
+                            });
                         }
                         osmpbf::Element::Relation(relation) => {
                             let id = RelationID(relation.id());
+                            let version = relation.info().version();
                             let mut tags = HashMap::new();
                             for (k, v) in relation.tags() {
                                 tags.insert(k.to_string(), v.to_string());
@@ -79,7 +100,12 @@ pub fn parse_pbf<F: FnMut(Element)>(input_bytes: &[u8], mut callback: F) -> Resu
                                 };
                                 members.push((role.to_string(), id));
                             }
-                            callback(Element::Relation { id, tags, members });
+                            callback(Element::Relation {
+                                id,
+                                tags,
+                                members,
+                                version,
+                            });
                         }
                     }
                 });

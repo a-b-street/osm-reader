@@ -26,11 +26,19 @@ pub fn parse_xml<F: FnMut(Element)>(input_bytes: &[u8], mut callback: F) -> Resu
                 let lon = obj.attribute("lon").unwrap().parse::<f64>()?;
                 let lat = obj.attribute("lat").unwrap().parse::<f64>()?;
                 let tags = read_tags(obj);
-                callback(Element::Node { id, lon, lat, tags });
+                let version = obj.attribute("version").and_then(|x| x.parse::<i32>().ok());
+                callback(Element::Node {
+                    id,
+                    lon,
+                    lat,
+                    tags,
+                    version,
+                });
             }
             "way" => {
                 let id = WayID(obj.attribute("id").unwrap().parse::<i64>()?);
                 let tags = read_tags(obj);
+                let version = obj.attribute("version").and_then(|x| x.parse::<i32>().ok());
 
                 let mut node_ids = Vec::new();
                 for child in obj.children() {
@@ -40,11 +48,18 @@ pub fn parse_xml<F: FnMut(Element)>(input_bytes: &[u8], mut callback: F) -> Resu
                         node_ids.push(n);
                     }
                 }
-                callback(Element::Way { id, node_ids, tags });
+                callback(Element::Way {
+                    id,
+                    node_ids,
+                    tags,
+                    version,
+                });
             }
             "relation" => {
                 let id = RelationID(obj.attribute("id").unwrap().parse::<i64>()?);
                 let tags = read_tags(obj);
+                let version = obj.attribute("version").and_then(|x| x.parse::<i32>().ok());
+
                 let mut members = Vec::new();
                 for child in obj.children() {
                     if child.tag_name().name() == "member" {
@@ -70,7 +85,12 @@ pub fn parse_xml<F: FnMut(Element)>(input_bytes: &[u8], mut callback: F) -> Resu
                         members.push((child.attribute("role").unwrap().to_string(), member));
                     }
                 }
-                callback(Element::Relation { id, members, tags });
+                callback(Element::Relation {
+                    id,
+                    members,
+                    tags,
+                    version,
+                });
             }
             _ => {}
         }
