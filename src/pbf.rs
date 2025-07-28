@@ -8,6 +8,10 @@ pub fn parse_pbf<F: FnMut(Element)>(input_bytes: &[u8], mut callback: F) -> Resu
     while let Some(Ok(blob)) = reader.next() {
         match blob.decode()? {
             BlobDecode::OsmHeader(header) => {
+                if let Some(timestamp) = header.osmosis_replication_timestamp() {
+                    callback(Element::Timestamp(timestamp));
+                }
+
                 if let Some(bbox) = header.bbox() {
                     callback(Element::Bounds {
                         min_lon: bbox.left,

@@ -70,6 +70,9 @@ impl fmt::Display for OsmID {
 // TODO Into for both directions
 
 pub enum Element {
+    /// The file-wide replication timestamp (seconds since the epoch), if it's present. Parsed from
+    /// Overpass XML and PBF.
+    Timestamp(i64),
     Bounds {
         min_lon: f64,
         min_lat: f64,

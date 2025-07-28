@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use anyhow::Result;
+use chrono::{DateTime, Utc};
 
 use crate::*;
 
@@ -13,6 +14,13 @@ pub fn parse_xml<F: FnMut(Element)>(input_bytes: &[u8], mut callback: F) -> Resu
             continue;
         }
         match obj.tag_name().name() {
+            "meta" => {
+                if let Some(timestamp) = obj.attribute("osm_base") {
+                    if let Ok(datetime) = timestamp.parse::<DateTime<Utc>>() {
+                        callback(Element::Timestamp(datetime.timestamp()));
+                    }
+                }
+            }
             "bounds" => {
                 callback(Element::Bounds {
                     min_lon: obj.attribute("minlon").unwrap().parse::<f64>().unwrap(),
