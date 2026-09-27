@@ -8,7 +8,7 @@ use anyhow::Result;
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
-pub use self::pbf::parse_pbf;
+pub use self::pbf::{parse_pbf, parse_pbf_reader};
 pub use self::xml::parse_xml;
 
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]

@@ -1,10 +1,20 @@
+use std::io::Read;
+
 use anyhow::Result;
 use osmpbf::{BlobDecode, BlobReader};
 
 use crate::*;
 
-pub fn parse_pbf<F: FnMut(Element)>(input_bytes: &[u8], mut callback: F) -> Result<()> {
-    let mut reader = BlobReader::new(input_bytes);
+pub fn parse_pbf<F: FnMut(Element)>(input_bytes: &[u8], callback: F) -> Result<()> {
+    parse_pbf_reader(input_bytes, callback)
+}
+
+/// Like `parse_pbf`, but streams from any reader, instead of requiring all bytes in memory.
+pub fn parse_pbf_reader<R: Read + Send, F: FnMut(Element)>(
+    reader: R,
+    mut callback: F,
+) -> Result<()> {
+    let mut reader = BlobReader::new(reader);
     while let Some(Ok(blob)) = reader.next() {
         match blob.decode()? {
             BlobDecode::OsmHeader(header) => {
